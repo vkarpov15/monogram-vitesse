@@ -1,2 +1,2 @@
-# monogram-validation
+# monogram-vitesse
 `.$validate()` for monogram documents
