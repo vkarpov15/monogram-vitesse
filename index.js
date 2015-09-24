@@ -3,8 +3,24 @@
 let _ = require('lodash');
 let vitesse = require('vitesse');
 
-let ALLOWED_OPERATORS = new WeakMap();
-ALLOWED_OPERATORS.set(Number, ['$gt', '$gte', '$in', '$lt', '$lte']);
+let VITESSE_TYPES = new WeakMap();
+
+VITESSE_TYPES.set(Array, {
+  nodeType: vitesse.ArrayNode,
+  allowedOperators: ['$gt', '$gte', '$lt', '$lte']
+});
+VITESSE_TYPES.set(Boolean, {
+  nodeType: vitesse.BooleanNode,
+  allowedOperators: []
+});
+VITESSE_TYPES.set(Number, {
+  nodeType: vitesse.NumberNode,
+  allowedOperators: ['$gt', '$gte', '$in', '$lt', '$lte', '$multipleOf']
+});
+VITESSE_TYPES.set(String, {
+  nodeType: vitesse.StringNode,
+  allowedOperators: ['$gt', '$gte', '$in', '$lt', '$lte', '$regexp']
+});
 
 module.exports = ValidatePlugin;
 
@@ -29,9 +45,16 @@ function visitArray(arr, vitesseNode) {
     } else if (typeof arr[0] === 'object') {
       let keys = Object.keys(value);
       if (keys.length > 0 && keys[0].charAt(0) === '$') {
-        let numNode = new vitesse.NumberNode(null, null, { typeCheck: true });
-        numNode.addValidation(_.pick(value, ALLOWED_OPERATORS.get(Number)));
-        vitesseNode.addChild(key, numNode);
+        if (value.$type && VITESSE_TYPES.has(value.$type)) {
+          let type = VITESSE_TYPES.get(value.$type);
+          let Node = type.nodeType;
+          let node = new Node(null, null, { typeCheck: true });
+          if (value.$required) {
+            vitesseNode.requiredFields([key]);
+          }
+          node.addValidation(_.pick(value, type.allowedOperators));
+          vitesseNode.addChild(key, node);
+        }
         return;
       }
 
@@ -39,8 +62,12 @@ function visitArray(arr, vitesseNode) {
       vitesseNode.addChild(key, objNode);
       visitObject(value, objNode);
     } else {
-      let numNode = new vitesse.NumberNode(null, null, { typeCheck: true });
-      vitesseNode.addChild(key, numNode);
+      if (VITESSE_TYPES.has(arr[0])) {
+        let Node = VITESSE_TYPES.get(arr[0]).nodeType;
+        let node = new Node(null, null, { typeCheck: true });
+        vitesseNode.addChild(key, node);
+      }
+
     }
   }
 }
@@ -54,9 +81,16 @@ function visitObject(obj, vitesseNode) {
     } else if (typeof value === 'object') {
       let keys = Object.keys(value);
       if (keys.length > 0 && keys[0].charAt(0) === '$') {
-        let numNode = new vitesse.NumberNode(null, null, { typeCheck: true });
-        numNode.addValidation(_.pick(value, ALLOWED_OPERATORS.get(Number)));
-        vitesseNode.addChild(key, numNode);
+        if (value.$type && VITESSE_TYPES.has(value.$type)) {
+          let type = VITESSE_TYPES.get(value.$type);
+          let Node = type.nodeType;
+          let node = new Node(null, null, { typeCheck: true });
+          if (value.$required) {
+            vitesseNode.requiredFields([key]);
+          }
+          node.addValidation(_.pick(value, type.allowedOperators));
+          vitesseNode.addChild(key, node);
+        }
         return;
       }
 
