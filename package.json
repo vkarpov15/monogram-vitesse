@@ -1,9 +1,9 @@
 {
-  "name": "monogram-validation",
+  "name": "monogram-vitesse",
   "version": "0.0.0",
   "author": "Valeri Karpov <valeri.karpov@mongodb.com>",
   "bugs": {
-    "url": "https://github.com/vkarpov15/monogram-validation/issues"
+    "url": "https://github.com/vkarpov15/monogram-vitesse/issues"
   },
   "dependencies": {
     "debug": "2.2.0",
@@ -22,12 +22,12 @@
   "engines": {
     "node": ">= 4.0.0"
   },
-  "homepage": "https://github.com/vkarpov15/monogram-validation#readme",
+  "homepage": "https://github.com/vkarpov15/monogram-vitesse#readme",
   "license": "Apache 2.0",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vkarpov15/monogram-validation.git"
+    "url": "git+https://github.com/vkarpov15/monogram-vitesse.git"
   },
   "scripts": {
     "coverage": "istanbul cover _mocha -- test/*.test.js",
