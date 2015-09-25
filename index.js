@@ -34,6 +34,16 @@ function ValidatePlugin(schema) {
   schema.method('document', '$validate', function() {
     return validator.validate(this);
   });
+
+  schema.middleware('$save', function*(next) {
+    let errors = this.$validate();
+    if (errors.length > 0) {
+      let error = new Error(_.pluck(errors, 'message').join(', '));
+      error.errors = errors;
+      throw error;
+    }
+    yield next;
+  });
 }
 
 function visitArray(arr, vitesseNode) {

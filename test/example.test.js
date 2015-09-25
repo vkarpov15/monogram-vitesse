@@ -89,4 +89,33 @@ describe('validation', function() {
       done(error);
     });
   });
+
+  it('$save errors on validation errors', function(done) {
+    co(function*() {
+      let db = yield monogram('mongodb://localhost:27017');
+      let schema = new monogram.Schema({
+        name: {
+          $type: String,
+          $required: true,
+          $in: ['Axl', 'Slash', 'Izzy', 'Duff', 'Adler']
+        }
+      });
+
+      validate(schema);
+
+      let Person = db.model({ schema: schema, collection: 'test' });
+
+      let doc = new Person({ name: 'Mick' });
+      try {
+        yield doc.$save();
+        return done(new Error('should have errored!'));
+      } catch(error) {
+        assert.equal(error.errors.length, 1);
+      }
+
+      done();
+    }).catch(function(error) {
+      done(error);
+    });
+  });
 });
