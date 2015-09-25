@@ -49,10 +49,13 @@ function visitArray(arr, vitesseNode) {
           let type = VITESSE_TYPES.get(value.$type);
           let Node = type.nodeType;
           let node = new Node(null, null, { typeCheck: true });
+          let validators = _.pick(value, type.allowedOperators);
           if (value.$required) {
             vitesseNode.requiredFields([key]);
           }
-          node.addValidation(_.pick(value, type.allowedOperators));
+          if (Object.keys(validators).length > 0) {
+            node.addValidation(validators);
+          }
           vitesseNode.addChild(key, node);
         }
         return;
@@ -85,10 +88,13 @@ function visitObject(obj, vitesseNode) {
           let type = VITESSE_TYPES.get(value.$type);
           let Node = type.nodeType;
           let node = new Node(null, null, { typeCheck: true });
+          let validators = _.pick(value, type.allowedOperators);
           if (value.$required) {
             vitesseNode.requiredFields([key]);
           }
-          node.addValidation(_.pick(value, type.allowedOperators));
+          if (Object.keys(validators).length > 0) {
+            node.addValidation(validators);
+          }
           vitesseNode.addChild(key, node);
         }
         return;
